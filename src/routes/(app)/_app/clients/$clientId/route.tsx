@@ -1,29 +1,15 @@
+import { getClientById } from "@/lib/features/clients/service";
 import { createFileRoute, Outlet, useLoaderData } from "@tanstack/react-router";
-
-type Client = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string | null;
-  phone: string | null;
-};
-
-const fakeClient: Client = {
-  id: "1",
-  firstName: "John",
-  lastName: "Doe",
-  email: "john.doe@example.com",
-  phone: "(555) 123-4567",
-};
+import { type Client } from "@clients/types";
 
 export const Route = createFileRoute("/(app)/_app/clients/$clientId")({
   component: ClientLayout,
-  loader: ({ params }) => {
-    return new Promise<Client>((resolve) => {
-      setTimeout(() => {
-        resolve(fakeClient);
-      }, 5000);
+  loader: async ({ params: { clientId }, context: { queryClient } }) => {
+    const client = await queryClient.fetchQuery({
+      queryKey: ["client", clientId],
+      queryFn: () => getClientById(clientId),
     });
+    return client;
   },
 });
 
@@ -39,7 +25,7 @@ function ClientLayout() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {client.firstName} {client.lastName}
+                  {client.first_name} {client.last_name}
                 </h1>
                 <p className="text-sm text-gray-500">Client ID: {client.id}</p>
               </div>

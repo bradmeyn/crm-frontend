@@ -21,7 +21,7 @@ export const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem("access");
+    const token = localStorage.getItem("access_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -41,8 +41,17 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
+      // Prevent infinite loops on refresh endpoint
+      if (originalRequest.url?.includes("/auth/token/refresh/")) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
+
       try {
-        const refreshToken = localStorage.getItem("refresh");
+        const refreshToken = localStorage.getItem("refresh_token");
 
         if (!refreshToken) {
           throw new Error("No refresh token available");

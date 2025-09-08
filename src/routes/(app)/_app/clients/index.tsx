@@ -20,35 +20,38 @@ import {
 import AddClientDialog from "./-components/add-client-dialog";
 import ClientTable from "./-components/client-list-table";
 
+import { getClients } from "@/lib/features/clients/service";
+import { useQuery } from "@tanstack/react-query";
+
 export const Route = createFileRoute("/(app)/_app/clients/")({
   component: ClientListPage,
   errorComponent: () => <div>Error loading clients</div>,
-  loader: () => {
-    // Simulate a data fetching delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(null);
-      }, 1000);
+  loader: async ({ context: { queryClient } }) => {
+    await queryClient.prefetchQuery({
+      queryKey: ["clients"],
+      queryFn: getClients,
     });
+    return null;
   },
 });
 
-export interface Client {
-  id: string;
-  salutation: string | null;
-  firstName: string;
-  preferredName: string | null;
-  lastName: string;
-  email: string | null;
-  phone: string | null;
-}
-
 function ClientListPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [clients] = useState<Client[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const {
+    data: clients = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["clients"],
+    queryFn: getClients,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   // Pagination calculations
 
@@ -61,7 +64,7 @@ function ClientListPage() {
       </div>
 
       <div className="mb-4 relative">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
         <Input
           placeholder="Search clients..."
           value={searchTerm}
@@ -106,7 +109,7 @@ function ClientListPage() {
               disabled={currentPage === 1}
               className="h-8 w-8"
             >
-              <ChevronsLeft className="h-4 w-4" />
+              <ChevronsLeft className="size-4" />
             </Button>
             <Button
               variant="outline"
@@ -115,7 +118,7 @@ function ClientListPage() {
               disabled={currentPage === 1}
               className="h-8 w-8"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="size-4" />
             </Button>
             <Button
               variant="outline"
@@ -124,7 +127,7 @@ function ClientListPage() {
               disabled={currentPage === totalPages}
               className="h-8 w-8"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="size-4" />
             </Button>
             <Button
               variant="outline"
@@ -133,7 +136,7 @@ function ClientListPage() {
               disabled={currentPage === totalPages}
               className="h-8 w-8"
             >
-              <ChevronsRight className="h-4 w-4" />
+              <ChevronsRight className="size-4" />
             </Button>
           </div>
         </div>

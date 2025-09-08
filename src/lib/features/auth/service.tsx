@@ -18,8 +18,8 @@ export interface User {
 }
 
 interface TokenResponse {
-  access: string; // Django JWT format
-  refresh: string; // Django JWT format
+  access: string;
+  refresh: string;
 }
 
 interface AuthResponse extends TokenResponse {
@@ -32,8 +32,8 @@ export async function register(data: RegisterCredentials) {
     console.log("Registration response", response.data);
 
     if (response.data.access) {
-      localStorage.setItem("access", response.data.access); // Store as access (matches Django)
-      localStorage.setItem("refresh", response.data.refresh); // Store as refresh (matches Django)
+      localStorage.setItem("access_token", response.data.access); // Store as access (matches Django)
+      localStorage.setItem("refresh_token", response.data.refresh); // Store as refresh (matches Django)
     }
 
     // Store user data if included in response
@@ -63,8 +63,8 @@ export async function login(data: LoginCredentials) {
 
     // Store tokens (Django returns 'access' and 'refresh')
     if (response.data.access) {
-      localStorage.setItem("access", response.data.access); // Store as access (matches Django)
-      localStorage.setItem("refresh", response.data.refresh); // Store as refresh (matches Django)
+      localStorage.setItem("access_token", response.data.access); // Store as access (matches Django)
+      localStorage.setItem("refresh_token", response.data.refresh); // Store as refresh (matches Django)
     }
 
     // Store user data (now included thanks to CustomTokenObtainPairSerializer)
@@ -86,16 +86,16 @@ export async function login(data: LoginCredentials) {
 export async function logout() {
   try {
     // Clear all stored auth data
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
 
     return true;
   } catch (error) {
     console.error("Logout error:", error);
     // Clear all auth data even if logout fails
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
 
     throw error;
@@ -104,43 +104,57 @@ export async function logout() {
 
 export async function refreshToken() {
   try {
-    const refreshTokenValue = localStorage.getItem("refresh");
+    const refreshTokenValue = localStorage.getItem("refresh_token");
 
     if (!refreshTokenValue) {
       throw new Error("No refresh token available");
     }
 
-    const response = await api.post<TokenResponse>("/auth/token/refresh/", {
-      refresh: refreshTokenValue, // Django expects 'refresh' field
-    });
+    // Use direct axios to avoid interceptor loops
+    const response = await axios.post<TokenResponse>(
+      `${import.meta.env.VITE_API_URL || "/api"}/auth/token/refresh/`,
+      { refresh: refreshTokenValue },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
-    // Update stored tokens (Django returns 'access' and 'refresh')
-    localStorage.setItem("access", response.data.access); // Store as access
+    localStorage.setItem("access_token", response.data.access);
     if (response.data.refresh) {
-      localStorage.setItem("refresh", response.data.refresh); // Store as refresh
+      localStorage.setItem("refresh_token", response.data.refresh);
     }
 
     return response.data;
   } catch (error) {
-    // If refresh fails, clear all auth data and redirect to login
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
+    console.error("Token refresh error:", error);
+    // Clear all auth data on refresh failure
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
-
     throw error;
   }
 }
 
 // Helper function to get the current access token
 export function getAccessToken(): string | null {
-  return localStorage.getItem("access");
+  return localStorage.getItem("access_token");
 }
 
 // Helper function to check if user is authenticated
 export function isAuthenticated(): boolean {
   const token = getAccessToken();
-  const refreshToken = localStorage.getItem("refresh");
-  return !!(token && refreshToken);
+  const refreshToken = localStorage.getItem("refresh_token");
+
+  if (!token || !refreshToken) return false;
+
+  // Optional: Check if token is expired
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const isExpired = payload.exp * 1000 < Date.now();
+    return !isExpired;
+  } catch {
+    return false; // Invalid token format
+  }
 }
 
 // Helper function to get current user

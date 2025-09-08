@@ -1,4 +1,3 @@
-import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@components/ui/card";
 
@@ -11,33 +10,42 @@ import {
   Briefcase,
   UserCircle,
 } from "lucide-react";
+import { getClientById } from "@clients/service";
+import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/(app)/_app/clients/$clientId/")({
   component: ClientDetailPage,
-  loader: () => {
-    // Simulate a data fetching delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(null);
-      }, 1000);
-    });
+  errorComponent: () => <div>Error loading client</div>,
+  loader: async ({ params: { clientId } }) => {
+    getClientById(clientId);
+    return null;
   },
 });
 
-// Mock client data
-const mockClient = {
-  id: "1",
-  firstName: "John",
-  lastName: "Doe",
-  email: "john.doe@email.com",
-  phone: "+1 234 567 8900",
-  address: "123 Main St, Austin, TX 78701",
-  dateOfBirth: "1985-05-15",
-  joinDate: "2020-03-10",
-  occupation: "Software Engineer",
-};
+function ClientDetailPage({
+  params: { clientId },
+}: {
+  params: { clientId: string };
+}) {
+  const {
+    data: client,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["client", clientId],
+    queryFn: () => getClientById(clientId),
+  });
 
-function ClientDetailPage() {
+  if (!client) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error loading client: {(error as Error).message}</div>;
+  }
+
   return (
     <div className="mx-auto max-w-4xl p-6">
       <Card className="border border-gray-200 shadow-sm">
@@ -60,11 +68,8 @@ function ClientDetailPage() {
               {/* Name and Title */}
               <div className="border-b border-gray-100 pb-4">
                 <h2 className="text-2xl font-semibold text-gray-900">
-                  {mockClient.firstName} {mockClient.lastName}
+                  {client.first_name} {client.last_name}
                 </h2>
-                <p className="text-base text-gray-600 mt-1">
-                  {mockClient.occupation}
-                </p>
               </div>
 
               {/* Information Grid */}
@@ -76,7 +81,7 @@ function ClientDetailPage() {
                       Email Address
                     </span>
                   </div>
-                  <p className="text-gray-900 pl-6">{mockClient.email}</p>
+                  <p className="text-gray-900 pl-6">{client.email}</p>
                 </div>
 
                 <div className="space-y-1">
@@ -86,7 +91,7 @@ function ClientDetailPage() {
                       Phone Number
                     </span>
                   </div>
-                  <p className="text-gray-900 pl-6">{mockClient.phone}</p>
+                  <p className="text-gray-900 pl-6">{client.phone}</p>
                 </div>
 
                 <div className="space-y-1">
@@ -96,7 +101,6 @@ function ClientDetailPage() {
                       Address
                     </span>
                   </div>
-                  <p className="text-gray-900 pl-6">{mockClient.address}</p>
                 </div>
 
                 <div className="space-y-1">
@@ -106,16 +110,13 @@ function ClientDetailPage() {
                       Date of Birth
                     </span>
                   </div>
-                  <p className="text-gray-900 pl-6">
-                    {new Date(mockClient.dateOfBirth).toLocaleDateString(
-                      "en-US",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
-                  </p>
+                  {/* <p className="text-gray-900 pl-6">
+                    {new Date(client.dateOfBirth).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p> */}
                 </div>
 
                 <div className="space-y-1">
@@ -125,13 +126,6 @@ function ClientDetailPage() {
                       Join Date
                     </span>
                   </div>
-                  <p className="text-gray-900 pl-6">
-                    {new Date(mockClient.joinDate).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
                 </div>
 
                 <div className="space-y-1">
@@ -141,7 +135,7 @@ function ClientDetailPage() {
                       Client ID
                     </span>
                   </div>
-                  <p className="text-gray-900 pl-6">#{mockClient.id}</p>
+                  <p className="text-gray-900 pl-6">#{client.id}</p>
                 </div>
               </div>
             </div>

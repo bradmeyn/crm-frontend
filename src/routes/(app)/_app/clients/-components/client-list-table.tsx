@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -16,8 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
 import { MoreHorizontal, ArrowUpDown } from "lucide-react";
-
-import type { Client } from "../index";
+import type { Client } from "@clients/types";
 
 export default function ClientTable({ clients }: { clients: Client[] }) {
   return (
@@ -69,8 +67,8 @@ export default function ClientTable({ clients }: { clients: Client[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {clients.map((client) => (
-            <ClientRow key={client.id} client={client} />
+          {clients.map((c) => (
+            <ClientRow key={c.id} client={c} />
           ))}
         </TableBody>
       </Table>
@@ -80,9 +78,9 @@ export default function ClientTable({ clients }: { clients: Client[] }) {
 
 function ClientRow({ client }: { client: Client }) {
   return (
-    <TableRow key={client.id}>
-      <TableCell>{client.firstName}</TableCell>
-      <TableCell>{client.lastName}</TableCell>
+    <TableRow>
+      <TableCell>{client.first_name}</TableCell>
+      <TableCell>{client.last_name}</TableCell>
       <TableCell>{client.email}</TableCell>
       <TableCell>{client.phone}</TableCell>
       <TableCell>

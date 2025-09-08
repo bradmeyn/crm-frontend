@@ -29,55 +29,72 @@ import {
   FormLabel,
   FormMessage,
 } from "@components/ui/form";
-import {
-  type ClientForm,
-  clientFormSchema,
-} from "@/lib/features/clients/schemas";
+import { type ClientForm, clientFormSchema } from "@clients/schemas";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createClient } from "@/lib/features/clients/service";
 
 export default function AddClientDialog() {
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const createClientMutation = useMutation({
+    mutationFn: createClient,
+    onSuccess: () => {
+      // Invalidate and refetch clients query
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+
+      // Show success message
+      alert("Client added successfully!");
+
+      // Close dialog and reset form
+      setOpen(false);
+      form.reset();
+    },
+    onError: (error: Error) => {
+      // Show error message
+      alert(error.message);
+    },
+  });
 
   const form = useForm<ClientForm>({
     resolver: zodResolver(clientFormSchema),
     defaultValues: {
       salutation: undefined,
-      firstName: "",
-      lastName: "",
-      preferredName: "",
+      first_name: "",
+      last_name: "",
+      preferred_name: "",
       email: "",
       phone: "",
     },
   });
 
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-  } = form;
+  const onSubmit = (data: ClientForm) => {
+    createClientMutation.mutate(data);
+  };
 
-  const onSubmit = async (data: ClientForm) => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(data);
-      setOpen(false);
-      form.reset(); // Reset form after successful submission
-    } finally {
+  // Reset form when dialog closes
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (!newOpen) {
+      form.reset();
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="gap-2">Add Client</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add New Client</DialogTitle>
-          <DialogDescription>Add a new client.</DialogDescription>
+          <DialogDescription>
+            Add a new client to your database.
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-4">
               {/* Name row with salutation, first name, and last name */}
               <div className="grid grid-cols-4 gap-4">
@@ -89,7 +106,7 @@ export default function AddClientDialog() {
                       <FormLabel>Salutation</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value || ""}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -111,7 +128,7 @@ export default function AddClientDialog() {
 
                 <FormField
                   control={form.control}
-                  name="firstName"
+                  name="first_name"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
                       <FormLabel>First Name</FormLabel>
@@ -125,7 +142,7 @@ export default function AddClientDialog() {
 
                 <FormField
                   control={form.control}
-                  name="lastName"
+                  name="last_name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
@@ -141,7 +158,7 @@ export default function AddClientDialog() {
               {/* Preferred Name row */}
               <FormField
                 control={form.control}
-                name="preferredName"
+                name="preferred_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Preferred Name</FormLabel>
@@ -198,11 +215,12 @@ export default function AddClientDialog() {
                 variant="outline"
                 type="button"
                 onClick={() => setOpen(false)}
+                disabled={createClientMutation.isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Adding..." : "Add Client"}
+              <Button type="submit" disabled={createClientMutation.isPending}>
+                {createClientMutation.isPending ? "Adding..." : "Add Client"}
               </Button>
             </DialogFooter>
           </form>

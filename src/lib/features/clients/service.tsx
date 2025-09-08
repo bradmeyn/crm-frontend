@@ -5,7 +5,7 @@ import { Client } from "./types";
 
 export async function createClient(data: ClientForm) {
   try {
-    const response = await api.post<Client>("/clients", data);
+    const response = await api.post<Client>("/clients/", data);
 
     return response.data;
   } catch (error) {
@@ -24,7 +24,7 @@ export async function createClient(data: ClientForm) {
 
 export async function getClients() {
   try {
-    const response = await api.get<Client[]>("/clients");
+    const response = await api.get<Client[]>("/clients/");
 
     return response.data;
   } catch (error) {
@@ -43,7 +43,7 @@ export async function getClients() {
 
 export async function getClientById(clientId: string) {
   try {
-    const response = await api.get<Client>(`/clients/${clientId}`);
+    const response = await api.get<Client>(`/clients/${clientId}/`);
 
     return response.data;
   } catch (error) {
@@ -59,9 +59,10 @@ export async function getClientById(clientId: string) {
     throw error;
   }
 }
+
 export async function updateClient(clientId: string, data: ClientForm) {
   try {
-    const response = await api.put<Client>(`/clients/${clientId}`, data);
+    const response = await api.put<Client>(`/clients/${clientId}/`, data);
 
     return response.data;
   } catch (error) {
@@ -77,9 +78,10 @@ export async function updateClient(clientId: string, data: ClientForm) {
     throw error;
   }
 }
+
 export async function deleteClient(clientId: string) {
   try {
-    await api.delete(`/clients/${clientId}`);
+    await api.delete(`/clients/${clientId}/`);
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorData = error.response?.data as ApiError;

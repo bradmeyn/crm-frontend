@@ -10,6 +10,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@auth/*": ["./src/lib/features/auth/*"],
+      "@clients/*": ["./src/lib/features/clients/*"],
       "@components/*": ["./src/lib/components/*"],
       "@contexts/*": ["./src/lib/contexts/*"],
       "@hooks/*": ["./src/lib/hooks/*"],

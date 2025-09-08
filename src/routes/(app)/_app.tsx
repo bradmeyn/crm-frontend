@@ -21,31 +21,30 @@ import SearchDialog from "./_app/-components/SearchDialog";
 
 export const Route = createFileRoute("/(app)/_app")({
   component: ProtectedLayout,
-  loader: ({ context, location }) => {
+  beforeLoad: ({ context, location }) => {
     if (!context.auth.isAuthenticated) {
       throw redirect({
         to: "/login",
         search: {
+          // Optional: redirect back after login
           redirect: location.href,
         },
       });
     }
   },
-});
-
-export default function ProtectedLayout() {
-  const { user, isLoading } = useAuth();
-  // Show loading state while auth is being determined
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-t-blue-500 border-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
+  // Optional: Show loading state while auth is being determined
+  pendingComponent: () => (
+    <div className="flex h-screen items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-t-blue-500 border-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
+        <p>Loading...</p>
       </div>
-    );
-  }
+    </div>
+  ),
+});
+export default function ProtectedLayout() {
+  const { user } = useAuth();
+  // Show loading state while auth is being determined
 
   return (
     <div className="flex h-screen gap-4 bg-white">
@@ -57,7 +56,7 @@ export default function ProtectedLayout() {
             to="/dashboard"
             className="flex items-center gap-2 text-lg font-semibold text-white"
           >
-            <span>{user?.firstName}</span>
+            <span>{user?.first_name}</span>
           </Link>
           <button className="rounded-md p-1 hover:bg-slate-700 text-white">
             <ChevronRight size={16} />

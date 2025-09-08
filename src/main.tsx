@@ -1,4 +1,4 @@
-import { AuthProvider, useAuth } from "@auth/context";
+import { AuthProvider, useAuth, type AuthContextType } from "@auth/context";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
@@ -7,16 +7,17 @@ import "./index.css";
 
 const queryClient = new QueryClient();
 
+export interface RouterContext {
+  auth: AuthContextType;
+  queryClient: QueryClient;
+}
+
+// Create router with initial context
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   context: {
-    auth: {
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-      error: null,
-    },
+    auth: undefined! as AuthContextType, // Will be set in RouterProvider
     queryClient,
   },
 });
@@ -31,7 +32,14 @@ const rootElement = document.getElementById("app")!;
 
 function InnerApp() {
   const auth = useAuth();
-  return <RouterProvider router={router} context={{ auth, queryClient }} />;
+
+  // Create the context object with current auth state
+  const routerContext: RouterContext = {
+    auth,
+    queryClient,
+  };
+
+  return <RouterProvider router={router} context={routerContext} />;
 }
 
 function App() {
