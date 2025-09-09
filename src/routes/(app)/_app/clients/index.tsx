@@ -58,7 +58,7 @@ function ClientListPage() {
   return (
     <main className="container py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Clients</h1>
+        <h1 className="text-3xl font-bold text-white">Clients</h1>
 
         <AddClientDialog />
       </div>
@@ -75,7 +75,7 @@ function ClientListPage() {
 
       <ClientTable clients={clients} />
 
-      <div className="flex items-center justify-between space-x-2 py-4">
+      <div className="flex items-center justify-between space-x-2 py-4 text-white">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
@@ -98,7 +98,7 @@ function ClientListPage() {
           </Select>
         </div>
         <div className="flex items-center space-x-2">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm ">
             Page {currentPage} of {totalPages}
           </div>
           <div className="flex items-center space-x-2">

@@ -76,7 +76,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 b">
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-semibold">Dashboard</h1>
       </div>
@@ -109,7 +109,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <Card className="col-span-1">
           <CardHeader>
             <CardTitle>Overview</CardTitle>

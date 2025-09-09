@@ -30,7 +30,7 @@ import { registerSchema, type RegisterCredentials } from "@auth/schemas";
 import { useAuth } from "@auth/context";
 
 import { cn } from "@utils/shadcn";
-import LoadingSpinner from "@/lib/components/ui/loading-spinner";
+import LoadingSpinner from "@components/loading-spinner";
 
 export const Route = createFileRoute("/(auth)/register/")({
   component: RegisterPage,
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/(auth)/register/")({
 function RegisterPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { register, isLoading } = useAuth();
+  const { register } = useAuth();
 
   const form = useForm<RegisterCredentials>({
     resolver: zodResolver(registerSchema),
@@ -219,9 +219,9 @@ function RegisterPage() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={!form.formState.isValid || isLoading}
+                  disabled={!form.formState.isValid}
                 >
-                  {isLoading || form.formState.isSubmitting ? (
+                  {form.formState.isSubmitting ? (
                     <LoadingSpinner text="Creating account..." />
                   ) : (
                     "Sign up"

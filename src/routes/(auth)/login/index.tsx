@@ -27,7 +27,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "@tanstack/react-router";
 import { loginSchema, type LoginCredentials } from "@auth/schemas";
 import { useAuth } from "@auth/context";
-import LoadingSpinner from "@/lib/components/ui/loading-spinner";
+import LoadingSpinner from "@components/loading-spinner";
 
 export const Route = createFileRoute("/(auth)/login/")({
   component: LoginPage,
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/(auth)/login/")({
 function LoginPage() {
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState("");
-  const { login, isLoading } = useAuth();
+  const { login } = useAuth();
 
   const form = useForm<LoginCredentials>({
     resolver: zodResolver(loginSchema),
@@ -63,14 +63,14 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted">
-      <header className="py-6 px-8 border-b bg-background">
-        <Link to="/" className="text-xl font-bold">
+    <div className="min-h-screen bg-background">
+      <header className="py-6 px-8 border-b ">
+        <Link to="/" className="text-xl font-bold text-white">
           CRM
         </Link>
       </header>
 
-      <main className="container max-w-md py-12">
+      <main className="container max-w-md mx-auto py-12">
         <Card>
           <CardHeader className="space-y-4">
             <CardTitle className="text-2xl">Welcome back</CardTitle>
@@ -137,9 +137,9 @@ function LoginPage() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={!form.formState.isValid || isLoading}
+                  disabled={!form.formState.isValid}
                 >
-                  {isLoading || form.formState.isSubmitting ? (
+                  {form.formState.isSubmitting ? (
                     <LoadingSpinner text="Signing in..." />
                   ) : (
                     "Sign in"

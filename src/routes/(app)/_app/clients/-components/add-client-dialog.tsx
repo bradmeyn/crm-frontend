@@ -32,6 +32,7 @@ import {
 import { type ClientForm, clientFormSchema } from "@clients/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/features/clients/service";
+import { PlusCircle } from "lucide-react";
 
 export default function AddClientDialog() {
   const [open, setOpen] = useState(false);
@@ -83,7 +84,9 @@ export default function AddClientDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className="gap-2">Add Client</Button>
+        <Button size={"sm"} className="gap-2">
+          <PlusCircle /> Quick Add
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>

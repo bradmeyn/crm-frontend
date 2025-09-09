@@ -7,7 +7,7 @@ export const Route = createFileRoute("/")({
 
 function Header() {
   return (
-    <header className="bg-white shadow-xs dark:bg-neutral-950 dark:text-neutral-50">
+    <header className="">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center font-semibold">
@@ -29,7 +29,7 @@ function Header() {
 
 function Footer() {
   return (
-    <footer className="bg-white dark:bg-neutral-950 dark:text-neutral-50">
+    <footer className=" ">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-center">
           <a href="/" className="shrink-0">
@@ -43,12 +43,12 @@ function Footer() {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
       <main className="grow">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="py-20 text-center">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6">
+            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6 text-white">
               Supercharge Your Customer Relationships
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
@@ -56,7 +56,7 @@ export default function LandingPage() {
               deals, and grow your business faster.
             </p>
             <div className="flex gap-4 justify-center">
-              <Button>Get Started</Button>
+              <Button variant={"default"}>Get Started</Button>
             </div>
           </div>
         </div>

@@ -48,8 +48,8 @@ function ClientDetailPage({
 
   return (
     <div className="mx-auto max-w-4xl p-6">
-      <Card className="border border-gray-200 shadow-sm">
-        <CardHeader className="border-b border-gray-100 pb-6">
+      <Card className="border shadow-sm">
+        <CardHeader className="border-b  pb-6">
           <CardTitle className="text-xl font-semibold text-gray-900">
             Client Information
           </CardTitle>
@@ -66,7 +66,7 @@ function ClientDetailPage({
             {/* Details Section */}
             <div className="flex-1 space-y-6">
               {/* Name and Title */}
-              <div className="border-b border-gray-100 pb-4">
+              <div className="border-b  pb-4">
                 <h2 className="text-2xl font-semibold text-gray-900">
                   {client.first_name} {client.last_name}
                 </h2>

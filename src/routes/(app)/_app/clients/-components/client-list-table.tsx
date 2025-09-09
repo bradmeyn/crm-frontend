@@ -14,55 +14,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import type { Client } from "@clients/types";
 
 export default function ClientTable({ clients }: { clients: Client[] }) {
   return (
-    <div className="border rounded-lg">
+    <div className="border rounded-lg text-muted-foreground">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>
-              <Button
-                variant="ghost"
-                onClick={() => {}}
-                className="h-8 flex items-center gap-1"
-              >
-                First Name
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                onClick={() => {}}
-                className="h-8 flex items-center gap-1"
-              >
-                Last Name
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                onClick={() => {}}
-                className="h-8 flex items-center gap-1"
-              >
-                Email
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                onClick={() => {}}
-                className="h-8 flex items-center gap-1"
-              >
-                Phone
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </TableHead>
+          <TableRow className="text-muted-foreground">
+            <TableHead>First Name</TableHead>
+            <TableHead>Last Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Phone</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -78,7 +42,7 @@ export default function ClientTable({ clients }: { clients: Client[] }) {
 
 function ClientRow({ client }: { client: Client }) {
   return (
-    <TableRow>
+    <TableRow className="text-white">
       <TableCell>{client.first_name}</TableCell>
       <TableCell>{client.last_name}</TableCell>
       <TableCell>{client.email}</TableCell>
@@ -87,7 +51,7 @@ function ClientRow({ client }: { client: Client }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
-              <MoreHorizontal className="h-4 w-4" />
+              <MoreVertical />
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
