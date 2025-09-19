@@ -27,10 +27,10 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "@tanstack/react-router";
 
 import { registerSchema, type RegisterCredentials } from "@auth/schemas";
-import { useAuth } from "@auth/context";
 
 import { cn } from "@utils/shadcn";
 import LoadingSpinner from "@components/loading-spinner";
+import { register } from "@auth/service";
 
 export const Route = createFileRoute("/(auth)/register/")({
   component: RegisterPage,
@@ -39,7 +39,6 @@ export const Route = createFileRoute("/(auth)/register/")({
 function RegisterPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { register } = useAuth();
 
   const form = useForm<RegisterCredentials>({
     resolver: zodResolver(registerSchema),
@@ -47,11 +46,11 @@ function RegisterPage() {
 
     defaultValues: {
       email: "",
-      first_name: "",
-      last_name: "",
-      business_name: "",
+      firstName: "",
+      lastName: "",
+      businessName: "",
       password: "",
-      confirm_password: "",
+      confirmPassword: "",
     },
   });
 
@@ -61,25 +60,23 @@ function RegisterPage() {
 
       await register(data);
 
-      // Navigate to dashboard after successful registration (auto-logged in)
       navigate({ to: "/dashboard" });
     } catch (error) {
       console.error("Registration error:", error);
-      setErrorMessage(
-        error instanceof Error ? error.message : "Registration failed"
-      );
+
+      setErrorMessage("Registration failed");
     }
   }
 
   return (
-    <div className="min-h-screen bg-muted">
+    <div className="min-h-screen ">
       <header className="py-6 px-8 border-b bg-background">
         <Link to="/" className="text-xl font-bold">
-          Rolodex
+          CRM
         </Link>
       </header>
 
-      <main className="container max-w-xl py-12">
+      <main className="container max-w-xl py-12 mx-auto">
         <Card>
           {errorMessage ? (
             <Alert variant="destructive">
@@ -130,7 +127,7 @@ function RegisterPage() {
 
                   <FormField
                     control={form.control}
-                    name="business_name"
+                    name="businessName"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Business Name</FormLabel>
@@ -152,7 +149,7 @@ function RegisterPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="first_name"
+                      name="firstName"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>First Name</FormLabel>
@@ -166,7 +163,7 @@ function RegisterPage() {
 
                     <FormField
                       control={form.control}
-                      name="last_name"
+                      name="lastName"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Last Name</FormLabel>
@@ -199,7 +196,7 @@ function RegisterPage() {
 
                   <FormField
                     control={form.control}
-                    name="confirm_password"
+                    name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Confirm Password</FormLabel>
