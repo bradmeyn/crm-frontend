@@ -51,6 +51,7 @@ function LoginPage() {
     try {
       setLoginError("");
       await login(data);
+      
       navigate({ to: "/dashboard" });
     } catch (error) {
       console.error("Login error", error);

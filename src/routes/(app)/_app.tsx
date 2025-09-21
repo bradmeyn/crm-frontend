@@ -1,18 +1,6 @@
-import {
-  Outlet,
-  createFileRoute,
-  Link,
-  useRouter,
-} from "@tanstack/react-router";
+import { Outlet, createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@components/ui/button";
-import {
-  LayoutDashboard,
-  Users,
-  Bell,
-  LogOut,
-  User,
-  Settings,
-} from "lucide-react";
+import { LayoutDashboard, Users, Bell, User, Settings } from "lucide-react";
 import { redirect } from "@tanstack/react-router";
 import { useAuth } from "@auth/context";
 import SearchDialog from "./_app/-components/SearchDialog";
@@ -24,7 +12,6 @@ export const Route = createFileRoute("/(app)/_app")({
       throw redirect({
         to: "/login",
         search: {
-          // Optional: redirect back after login
           redirect: location.href,
         },
       });
@@ -60,7 +47,7 @@ export default function ProtectedLayout() {
             to="/dashboard"
             className="flex items-center gap-2 text-lg font-semibold text-white"
           >
-            <span>{user?.business.name}</span>
+            <span>{user?.business?.name || "CRM"}</span>
           </Link>
         </div>
 

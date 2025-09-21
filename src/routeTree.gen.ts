@@ -17,6 +17,8 @@ import { Route as IndexImport } from './routes/index'
 import { Route as appAppImport } from './routes/(app)/_app'
 import { Route as authRegisterIndexImport } from './routes/(auth)/register/index'
 import { Route as authLoginIndexImport } from './routes/(auth)/login/index'
+import { Route as authEmailConfirmedIndexImport } from './routes/(auth)/email-confirmed/index'
+import { Route as authEmailConfirmationIndexImport } from './routes/(auth)/email-confirmation/index'
 import { Route as appAppDashboardIndexImport } from './routes/(app)/_app/dashboard/index'
 import { Route as appAppClientsIndexImport } from './routes/(app)/_app/clients/index'
 import { Route as appAppClientsClientIdRouteImport } from './routes/(app)/_app/clients/$clientId/route'
@@ -55,6 +57,20 @@ const authLoginIndexRoute = authLoginIndexImport.update({
   path: '/login/',
   getParentRoute: () => rootRoute,
 } as any)
+
+const authEmailConfirmedIndexRoute = authEmailConfirmedIndexImport.update({
+  id: '/(auth)/email-confirmed/',
+  path: '/email-confirmed/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const authEmailConfirmationIndexRoute = authEmailConfirmationIndexImport.update(
+  {
+    id: '/(auth)/email-confirmation/',
+    path: '/email-confirmation/',
+    getParentRoute: () => rootRoute,
+  } as any,
+)
 
 const appAppDashboardIndexRoute = appAppDashboardIndexImport.update({
   id: '/dashboard/',
@@ -108,6 +124,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof appAppImport
       parentRoute: typeof appRoute
+    }
+    '/(auth)/email-confirmation/': {
+      id: '/(auth)/email-confirmation/'
+      path: '/email-confirmation'
+      fullPath: '/email-confirmation'
+      preLoaderRoute: typeof authEmailConfirmationIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/(auth)/email-confirmed/': {
+      id: '/(auth)/email-confirmed/'
+      path: '/email-confirmed'
+      fullPath: '/email-confirmed'
+      preLoaderRoute: typeof authEmailConfirmedIndexImport
+      parentRoute: typeof rootRoute
     }
     '/(auth)/login/': {
       id: '/(auth)/login/'
@@ -197,6 +227,8 @@ const appRouteWithChildren = appRoute._addFileChildren(appRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof appAppRouteWithChildren
+  '/email-confirmation': typeof authEmailConfirmationIndexRoute
+  '/email-confirmed': typeof authEmailConfirmedIndexRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
   '/clients/$clientId': typeof appAppClientsClientIdRouteRouteWithChildren
@@ -207,6 +239,8 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof appAppRouteWithChildren
+  '/email-confirmation': typeof authEmailConfirmationIndexRoute
+  '/email-confirmed': typeof authEmailConfirmedIndexRoute
   '/login': typeof authLoginIndexRoute
   '/register': typeof authRegisterIndexRoute
   '/clients': typeof appAppClientsIndexRoute
@@ -219,6 +253,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(app)': typeof appRouteWithChildren
   '/(app)/_app': typeof appAppRouteWithChildren
+  '/(auth)/email-confirmation/': typeof authEmailConfirmationIndexRoute
+  '/(auth)/email-confirmed/': typeof authEmailConfirmedIndexRoute
   '/(auth)/login/': typeof authLoginIndexRoute
   '/(auth)/register/': typeof authRegisterIndexRoute
   '/(app)/_app/clients/$clientId': typeof appAppClientsClientIdRouteRouteWithChildren
@@ -231,6 +267,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/email-confirmation'
+    | '/email-confirmed'
     | '/login'
     | '/register'
     | '/clients/$clientId'
@@ -240,6 +278,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/email-confirmation'
+    | '/email-confirmed'
     | '/login'
     | '/register'
     | '/clients'
@@ -250,6 +290,8 @@ export interface FileRouteTypes {
     | '/'
     | '/(app)'
     | '/(app)/_app'
+    | '/(auth)/email-confirmation/'
+    | '/(auth)/email-confirmed/'
     | '/(auth)/login/'
     | '/(auth)/register/'
     | '/(app)/_app/clients/$clientId'
@@ -262,6 +304,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   appRoute: typeof appRouteWithChildren
+  authEmailConfirmationIndexRoute: typeof authEmailConfirmationIndexRoute
+  authEmailConfirmedIndexRoute: typeof authEmailConfirmedIndexRoute
   authLoginIndexRoute: typeof authLoginIndexRoute
   authRegisterIndexRoute: typeof authRegisterIndexRoute
 }
@@ -269,6 +313,8 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   appRoute: appRouteWithChildren,
+  authEmailConfirmationIndexRoute: authEmailConfirmationIndexRoute,
+  authEmailConfirmedIndexRoute: authEmailConfirmedIndexRoute,
   authLoginIndexRoute: authLoginIndexRoute,
   authRegisterIndexRoute: authRegisterIndexRoute,
 }
@@ -285,6 +331,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/(app)",
+        "/(auth)/email-confirmation/",
+        "/(auth)/email-confirmed/",
         "/(auth)/login/",
         "/(auth)/register/"
       ]
@@ -306,6 +354,12 @@ export const routeTree = rootRoute
         "/(app)/_app/clients/",
         "/(app)/_app/dashboard/"
       ]
+    },
+    "/(auth)/email-confirmation/": {
+      "filePath": "(auth)/email-confirmation/index.tsx"
+    },
+    "/(auth)/email-confirmed/": {
+      "filePath": "(auth)/email-confirmed/index.tsx"
     },
     "/(auth)/login/": {
       "filePath": "(auth)/login/index.tsx"

@@ -58,13 +58,23 @@ function RegisterPage() {
     try {
       setErrorMessage(null);
 
-      await register(data);
+      const response = await register(data);
+      console.log("Registration response:", response);
 
-      navigate({ to: "/dashboard" });
+      // Check if registration requires email confirmation
+      if (response.requiresEmailConfirmation) {
+        // Redirect to email confirmation page
+        navigate({ to: "/email-confirmation" });
+      }
     } catch (error) {
       console.error("Registration error:", error);
 
-      setErrorMessage("Registration failed");
+      // Handle specific error types
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Registration failed. Please try again.");
+      }
     }
   }
 

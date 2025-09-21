@@ -26,5 +26,17 @@ export const registerSchema = z
     path: ["confirmPassword"],
   });
 
+export const emailConfirmedSearchSchema = z.object({
+  access_token: z.string().optional(),
+  refresh_token: z.string().optional(),
+  status: z.string().optional(),
+  autoLogin: z.string().optional(),
+});
+
+export const emailConfirmationSearchSchema = z.object({
+  status: z.string().optional(),
+  error: z.string().optional(),
+});
+
 export type LoginCredentials = z.infer<typeof loginSchema>;
 export type RegisterCredentials = z.infer<typeof registerSchema>;

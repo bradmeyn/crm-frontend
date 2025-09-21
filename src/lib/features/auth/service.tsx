@@ -18,28 +18,32 @@ export interface User {
 }
 
 interface TokenResponse {
-  access: string;
-  refresh: string;
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
 }
 
 interface AuthResponse extends TokenResponse {
   user: User;
 }
 
-export async function register(data: RegisterCredentials) {
+interface RegistrationResponse {
+  message: string;
+  userId: string;
+  businessId: string;
+  emailSent: boolean;
+  requiresEmailConfirmation: boolean;
+}
+
+export async function register(
+  data: RegisterCredentials
+): Promise<RegistrationResponse> {
   try {
-    const response = await api.post<AuthResponse>("/auth/register/", data);
-    console.log("Registration response", response.data);
-
-    if (response.data.access) {
-      localStorage.setItem("access_token", response.data.access); // Store as access (matches Django)
-      localStorage.setItem("refresh_token", response.data.refresh); // Store as refresh (matches Django)
-    }
-
-    // Store user data if included in response
-    if (response.data.user) {
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-    }
+    const response = await api.post<RegistrationResponse>(
+      "/auth/register/",
+      data
+    );
 
     return response.data;
   } catch (error) {
@@ -48,7 +52,7 @@ export async function register(data: RegisterCredentials) {
       throw new Error(
         errorData?.error ||
           errorData?.message ||
-          errorData?.detail || // Added detail for Django errors
+          errorData?.detail ||
           errorData?.errors?.join(", ") ||
           "Registration failed"
       );
@@ -59,12 +63,12 @@ export async function register(data: RegisterCredentials) {
 
 export async function login(data: LoginCredentials) {
   try {
-    const response = await api.post<AuthResponse>("/auth/token/", data); // Now returns user data too
+    const response = await api.post<AuthResponse>("/auth/login/", data); // Now returns user data too
 
     // Store tokens (Django returns 'access' and 'refresh')
-    if (response.data.access) {
-      localStorage.setItem("access_token", response.data.access); // Store as access (matches Django)
-      localStorage.setItem("refresh_token", response.data.refresh); // Store as refresh (matches Django)
+    if (response.data.access_token) {
+      localStorage.setItem("access_token", response.data.access_token); // Store as access (matches Django)
+      localStorage.setItem("refresh_token", response.data.refresh_token); // Store as refresh (matches Django)
     }
 
     // Store user data (now included thanks to CustomTokenObtainPairSerializer)
@@ -119,9 +123,9 @@ export async function refreshToken() {
       }
     );
 
-    localStorage.setItem("access_token", response.data.access);
-    if (response.data.refresh) {
-      localStorage.setItem("refresh_token", response.data.refresh);
+    localStorage.setItem("access_token", response.data.access_token);
+    if (response.data.refresh_token) {
+      localStorage.setItem("refresh_token", response.data.refresh_token);
     }
 
     return response.data;
@@ -157,8 +161,38 @@ export function isAuthenticated(): boolean {
   }
 }
 
-// Helper function to get current user
-export function getCurrentUser(): User | null {
+// Updated getCurrentUser function
+export async function getCurrentUser(): Promise<User | null> {
+  // First, try to get from localStorage
+  const cachedUser = localStorage.getItem("user");
+  if (cachedUser) {
+    try {
+      return JSON.parse(cachedUser);
+    } catch (error) {
+      console.error("Failed to parse cached user data:", error);
+      localStorage.removeItem("user"); // Clear corrupted data
+    }
+  }
+
+  // If no cached data and we have a valid token, fetch from API
+  if (isAuthenticated()) {
+    try {
+      const response = await api.get<User>("/auth/user");
+      const userData = response.data;
+
+      // Cache the fetched user data
+      localStorage.setItem("user", JSON.stringify(userData));
+      return userData;
+    } catch (error) {
+      console.error("Failed to fetch user from API:", error);
+      return null;
+    }
+  }
+
+  return null;
+}
+
+export function getCachedUser(): User | null {
   const userData = localStorage.getItem("user");
   return userData ? JSON.parse(userData) : null;
 }
