@@ -69,9 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const response = await authService.login(credentials);
-      console.log("Login response:", response);
       setIsAuthenticated(true);
       setUser(response.user);
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
     } catch (error) {
       setUser(null);
       setIsAuthenticated(false);
@@ -115,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated,
         isLoading,
         login,
-        // loginWithTokens removed
+
         logout,
         refreshUser,
       }}

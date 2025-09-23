@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -31,10 +31,14 @@ import LoadingSpinner from "@components/loading-spinner";
 
 export const Route = createFileRoute("/(auth)/login/")({
   component: LoginPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: (search.redirect as string) || undefined,
+  }),
 });
 
 function LoginPage() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/(auth)/login/" });
   const [loginError, setLoginError] = useState("");
   const { login } = useAuth();
 
@@ -51,8 +55,10 @@ function LoginPage() {
     try {
       setLoginError("");
       await login(data);
-      
-      navigate({ to: "/dashboard" });
+
+      // Use redirect from search params or default to dashboard
+      const redirectTo = search.redirect || "/dashboard";
+      navigate({ to: redirectTo, replace: true });
     } catch (error) {
       console.error("Login error", error);
       setLoginError(
