@@ -14,8 +14,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { MoreVertical } from "lucide-react";
 import type { Client } from "@clients/types";
+import { getClientById } from "@clients/service";
 
 export default function ClientTable({ clients }: { clients: Client[] }) {
   return (
@@ -41,22 +44,56 @@ export default function ClientTable({ clients }: { clients: Client[] }) {
 }
 
 function ClientRow({ client }: { client: Client }) {
+  const queryClient = useQueryClient();
+
+  const prefetch = () => {
+    queryClient.prefetchQuery({
+      queryKey: ["client", client.id],
+      queryFn: () => getClientById(client.id),
+    });
+  };
+
+  const navigate = useNavigate();
+
+  const go = () => navigate({ to: `/clients/${client.id}` });
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      go();
+    }
+  };
+
   return (
-    <TableRow className="text-white">
-      <TableCell>{client.first_name}</TableCell>
-      <TableCell>{client.last_name}</TableCell>
-      <TableCell>{client.email}</TableCell>
+    <TableRow
+      className="text-white cursor-pointer"
+      tabIndex={0}
+      onClick={go}
+      onKeyDown={onKeyDown}
+      onMouseEnter={prefetch}
+    >
+      <TableCell className="text-white">{client.firstName}</TableCell>
+      <TableCell>{client.lastName}</TableCell>
+      <TableCell className="truncate">{client.email}</TableCell>
       <TableCell>{client.phone}</TableCell>
       <TableCell>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => e.stopPropagation()}
+            >
               <MoreVertical />
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to={`/clients/${client.id}`} className="w-full block">
+                View details
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Edit</DropdownMenuItem>
             <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
           </DropdownMenuContent>

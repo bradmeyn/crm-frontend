@@ -21,15 +21,17 @@ import AddClientDialog from "./-components/add-client-dialog";
 import ClientTable from "./-components/client-list-table";
 
 import { getClients } from "@/lib/features/clients/service";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import type { Client } from "@/lib/features/clients/types";
 
 export const Route = createFileRoute("/(app)/_app/clients/")({
   component: ClientListPage,
   errorComponent: () => <div>Error loading clients</div>,
   loader: async ({ context: { queryClient } }) => {
-    await queryClient.prefetchQuery({
-      queryKey: ["clients"],
-      queryFn: getClients,
+    const initialParams = { page: 1, pageSize: 10, q: "" };
+    await queryClient.fetchQuery({
+      queryKey: ["clients", initialParams],
+      queryFn: () => getClients(initialParams),
     });
     return null;
   },
@@ -38,20 +40,23 @@ export const Route = createFileRoute("/(app)/_app/clients/")({
 function ClientListPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const {
-    data: clients = [],
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["clients"],
-    queryFn: getClients,
+  const queryKey = [
+    "clients",
+    { page: currentPage, pageSize: rowsPerPage, q: searchTerm },
+  ];
+
+  const { data: clients } = useSuspenseQuery<Client[], Error>({
+    queryKey,
+    queryFn: () =>
+      getClients({ page: currentPage, pageSize: rowsPerPage, q: searchTerm }),
+
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  const clientsArray = (clients ?? []) as Client[];
+  const totalPages = Math.max(1, Math.ceil(clientsArray.length / rowsPerPage));
 
   // Pagination calculations
 

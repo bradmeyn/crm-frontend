@@ -1,12 +1,12 @@
 export interface Client {
   id: string;
-  salutation: "Mr." | "Ms." | "Mrs." | "Dr." | "Prof.";
-  first_name: string;
-  last_name: string;
-  preferred_name?: string;
+  title: string;
+  firstName: string;
+  lastName: string;
+  preferredName?: string;
   email: string;
   phone: string;
-  created_at: string;
-  updated_at: string;
-  business_id: string;
+  createdAt: string;
+  updatedAt: string;
+  businessId: string;
 }

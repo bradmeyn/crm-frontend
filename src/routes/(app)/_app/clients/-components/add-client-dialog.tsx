@@ -29,7 +29,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@components/ui/form";
-import { type ClientForm, clientFormSchema } from "@clients/schemas";
+import {
+  type QuickNewClientForm,
+  quickNewClientSchema,
+} from "@clients/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/features/clients/service";
 import { PlusCircle } from "lucide-react";
@@ -44,32 +47,21 @@ export default function AddClientDialog() {
       // Invalidate and refetch clients query
       queryClient.invalidateQueries({ queryKey: ["clients"] });
 
-      // Show success message
       alert("Client added successfully!");
 
-      // Close dialog and reset form
       setOpen(false);
       form.reset();
     },
     onError: (error: Error) => {
-      // Show error message
       alert(error.message);
     },
   });
 
-  const form = useForm<ClientForm>({
-    resolver: zodResolver(clientFormSchema),
-    defaultValues: {
-      salutation: undefined,
-      first_name: "",
-      last_name: "",
-      preferred_name: "",
-      email: "",
-      phone: "",
-    },
+  const form = useForm<QuickNewClientForm>({
+    resolver: zodResolver(quickNewClientSchema),
   });
 
-  const onSubmit = (data: ClientForm) => {
+  const onSubmit = (data: QuickNewClientForm) => {
     createClientMutation.mutate(data);
   };
 
@@ -103,7 +95,7 @@ export default function AddClientDialog() {
               <div className="grid grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
-                  name="salutation"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Salutation</FormLabel>
@@ -117,11 +109,11 @@ export default function AddClientDialog() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Mr.">Mr.</SelectItem>
-                          <SelectItem value="Ms.">Ms.</SelectItem>
-                          <SelectItem value="Mrs.">Mrs.</SelectItem>
-                          <SelectItem value="Dr.">Dr.</SelectItem>
-                          <SelectItem value="Prof.">Prof.</SelectItem>
+                          <SelectItem value="Mr">Mr</SelectItem>
+                          <SelectItem value="Ms">Ms</SelectItem>
+                          <SelectItem value="Mrs">Mrs</SelectItem>
+                          <SelectItem value="Dr">Dr</SelectItem>
+                          <SelectItem value="Prof">Prof</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -131,7 +123,7 @@ export default function AddClientDialog() {
 
                 <FormField
                   control={form.control}
-                  name="first_name"
+                  name="firstName"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
                       <FormLabel>First Name</FormLabel>
@@ -145,7 +137,7 @@ export default function AddClientDialog() {
 
                 <FormField
                   control={form.control}
-                  name="last_name"
+                  name="lastName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
@@ -161,7 +153,7 @@ export default function AddClientDialog() {
               {/* Preferred Name row */}
               <FormField
                 control={form.control}
-                name="preferred_name"
+                name="preferredName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Preferred Name</FormLabel>
