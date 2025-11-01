@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@components/ui/sonner";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -17,7 +18,7 @@ const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   context: {
-    auth: undefined! as AuthContextType, // Will be set in RouterProvider
+    auth: undefined! as AuthContextType,
     queryClient,
   },
 });
@@ -33,7 +34,6 @@ const rootElement = document.getElementById("app")!;
 function InnerApp() {
   const auth = useAuth();
 
-  // Create the context object with current auth state
   const routerContext: RouterContext = {
     auth,
     queryClient,
@@ -53,6 +53,7 @@ function App() {
       <AuthProvider>
         <InnerApp />
       </AuthProvider>
+      <Toaster position="top-right" />
     </QueryClientProvider>
   );
 }

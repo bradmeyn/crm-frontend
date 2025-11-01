@@ -11,4 +11,4 @@ export const clientSchema = z.object({
   phone: z.string().min(1, "Phone number is required"),
 });
 
-export type NewClientForm = z.infer<typeof clientSchema>;
+export type NewClient = z.infer<typeof clientSchema>;

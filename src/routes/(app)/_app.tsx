@@ -3,7 +3,7 @@ import { Button } from "@components/ui/button";
 import { LayoutDashboard, Users, Bell, User, Settings } from "lucide-react";
 import { redirect } from "@tanstack/react-router";
 import { useAuth } from "@auth/context";
-import SearchDialog from "./_app/-components/SearchDialog";
+import SearchDialog from "@components/search-dialog";
 
 export const Route = createFileRoute("/(app)/_app")({
   component: ProtectedLayout,

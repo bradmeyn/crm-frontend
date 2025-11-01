@@ -1,9 +1,9 @@
 import { api, type ApiError } from "@services/api";
 import axios from "axios";
-import { NewClientForm } from "./schemas";
+import { type NewClient } from "./schemas";
 import { Client } from "./types";
 
-export async function createClient(data: NewClientForm) {
+export async function createClient(data: NewClient) {
   try {
     const response = await api.post<Client>("/clients/", data);
 
@@ -69,10 +69,9 @@ export async function getClientById(clientId: string) {
   }
 }
 
-export async function updateClient(clientId: string, data: NewClientForm) {
+export async function updateClient(clientId: string, data: NewClient) {
   try {
     const response = await api.put<Client>(`/clients/${clientId}/`, data);
-
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

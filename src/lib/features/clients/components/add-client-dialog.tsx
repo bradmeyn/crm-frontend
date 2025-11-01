@@ -29,39 +29,47 @@ import {
   FormLabel,
   FormMessage,
 } from "@components/ui/form";
-import {
-  type QuickNewClientForm,
-  quickNewClientSchema,
-} from "@clients/schemas";
+import { type NewClient, clientSchema } from "@clients/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createClient } from "@/lib/features/clients/service";
+import { createClient } from "@clients/service";
 import { PlusCircle } from "lucide-react";
+import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function AddClientDialog() {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const createClientMutation = useMutation({
     mutationFn: createClient,
     onSuccess: () => {
-      // Invalidate and refetch clients query
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-
-      alert("Client added successfully!");
+      toast.success("Client created successfully", {
+        action: {
+          label: "View client",
+          onClick: () => {
+            const id = createClientMutation.data?.id;
+            if (id) {
+              navigate({ to: `/clients/${id}` });
+            }
+          },
+        },
+      });
 
       setOpen(false);
       form.reset();
     },
     onError: (error: Error) => {
-      alert(error.message);
+      toast.error(`Error creating client: ${error.message}`);
     },
   });
 
-  const form = useForm<QuickNewClientForm>({
-    resolver: zodResolver(quickNewClientSchema),
+  const form = useForm<NewClient>({
+    resolver: zodResolver(clientSchema),
   });
 
-  const onSubmit = (data: QuickNewClientForm) => {
+  const onSubmit = (data: NewClient) => {
     createClientMutation.mutate(data);
   };
 

@@ -1,27 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-
-import { Button } from "@components/ui/button";
-import { Input } from "@components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@components/ui/select";
-import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
-import AddClientDialog from "./-components/add-client-dialog";
-import ClientTable from "./-components/client-list-table";
-
-import { getClients } from "@/lib/features/clients/service";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { DataTable } from "@components/data-table";
+import AddClientDialog from "@clients/components/add-client-dialog";
+import { clientColumns } from "@clients/components/client-columns";
+import { getClients, getClientById } from "@/lib/features/clients/service";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import type { Client } from "@/lib/features/clients/types";
 
 export const Route = createFileRoute("/(app)/_app/clients/")({
@@ -38,114 +22,45 @@ export const Route = createFileRoute("/(app)/_app/clients/")({
 });
 
 function ClientListPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const queryKey = [
-    "clients",
-    { page: currentPage, pageSize: rowsPerPage, q: searchTerm },
-  ];
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: clients } = useSuspenseQuery<Client[], Error>({
-    queryKey,
-    queryFn: () =>
-      getClients({ page: currentPage, pageSize: rowsPerPage, q: searchTerm }),
-
+    queryKey: ["clients"],
+    queryFn: () => getClients(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const clientsArray = (clients ?? []) as Client[];
-  const totalPages = Math.max(1, Math.ceil(clientsArray.length / rowsPerPage));
+  const handleRowClick = (client: Client) => {
+    navigate({ to: `/clients/${client.id}` });
+  };
 
-  // Pagination calculations
+  const handleRowMouseEnter = (client: Client) => {
+    queryClient.prefetchQuery({
+      queryKey: ["client", client.id],
+      queryFn: () => getClientById(client.id),
+    });
+  };
 
   return (
     <main className="container py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-white">Clients</h1>
-
         <AddClientDialog />
       </div>
 
-      <div className="mb-4 relative">
-        <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
-        <Input
-          placeholder="Search clients..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm pl-8"
-        />
-      </div>
-
-      <ClientTable clients={clients} />
-
-      <div className="flex items-center justify-between space-x-2 py-4 text-white">
-        <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
-          <Select
-            value={rowsPerPage.toString()}
-            onValueChange={(value) => {
-              setRowsPerPage(Number(value));
-              setCurrentPage(1);
-            }}
-          >
-            <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={rowsPerPage} />
-            </SelectTrigger>
-            <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={pageSize.toString()}>
-                  {pageSize}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="text-sm ">
-            Page {currentPage} of {totalPages}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-              className="h-8 w-8"
-            >
-              <ChevronsLeft className="size-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="h-8 w-8"
-            >
-              <ChevronLeft className="size-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="h-8 w-8"
-            >
-              <ChevronRight className="size-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-              className="h-8 w-8"
-            >
-              <ChevronsRight className="size-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <DataTable
+        data={clients || []}
+        columns={clientColumns}
+        searchPlaceholder="Search clients..."
+        searchKeys={["firstName", "lastName", "email", "phone"]}
+        pageSize={10}
+        onRowClick={handleRowClick}
+        onRowMouseEnter={handleRowMouseEnter}
+        rowClassName="text-white cursor-pointer hover:bg-muted/50"
+        enablePagination={true}
+        enableSearch={true}
+      />
     </main>
   );
 }
