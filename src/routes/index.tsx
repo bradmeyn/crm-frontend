@@ -48,7 +48,7 @@ export default function LandingPage() {
       <main className="grow">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="py-20 text-center">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6 text-white">
+            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6 ">
               Supercharge Your Customer Relationships
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">

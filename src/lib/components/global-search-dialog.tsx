@@ -26,28 +26,23 @@ export default function SearchDialog() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  // Mock client data
   const clients = [
-    { id: 1, name: "Acme Corp" },
-    { id: 2, name: "Globex Industries" },
-    { id: 3, name: "Stark Enterprises" },
-    { id: 4, name: "Wayne Enterprises" },
-    { id: 5, name: "Umbrella Corporation" },
+    { id: "1", name: "Acme Corp" },
+    { id: "2", name: "Globex Inc" },
+    { id: "3", name: "Soylent Co" },
+    { id: "4", name: "Initech" },
+    { id: "5", name: "Umbrella Corp" },
   ];
 
   return (
     <>
       <Button
-        variant="outline"
-        className="relative w-full justify-start text-sm text-muted-foreground font-light sm:pr-12 md:w-90 shadow-xs"
+        size="icon"
+        variant="ghost"
+        className="text-muted-foreground"
         onClick={() => setOpen(true)}
       >
-        <Search className="mr-2 h-4 w-4" />
-        <span className="hidden lg:inline-flex">Search clients...</span>
-        <span className="inline-flex lg:hidden">Search...</span>
-        <kbd className="pointer-events-none  absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-gray-50 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-          <span className="text-xs">⌘</span>K
-        </kbd>
+        <Search />
       </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>

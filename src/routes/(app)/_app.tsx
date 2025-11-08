@@ -3,7 +3,7 @@ import { Button } from "@components/ui/button";
 import { LayoutDashboard, Users, Bell, User, Settings } from "lucide-react";
 import { redirect } from "@tanstack/react-router";
 import { useAuth } from "@auth/context";
-import SearchDialog from "@components/search-dialog";
+import SearchDialog from "@components/global-search-dialog";
 
 export const Route = createFileRoute("/(app)/_app")({
   component: ProtectedLayout,
@@ -38,14 +38,14 @@ export default function ProtectedLayout() {
   // Show loading state while auth is being determined
 
   return (
-    <div className="flex h-screen gap-4 bg-card">
+    <div className="flex h-screen gap-4 bg-primary">
       {/* Sidebar */}
-      <aside className="w-60 flex flex-col overflow-hidden shadow-sm">
+      <aside className="w-60 flex flex-col overflow-hidden shadow-sm bg-primary">
         {/* Sidebar Header */}
         <div className="h-16 px-4 flex items-center justify-between">
           <Link
             to="/dashboard"
-            className="flex items-center gap-2 text-lg font-semibold text-white"
+            className="flex items-center gap-2 text-lg font-light text-white font-serif"
           >
             <span>{user?.business?.name || "CRM"}</span>
           </Link>
@@ -54,9 +54,7 @@ export default function ProtectedLayout() {
         {/* Sidebar Content */}
         <div className="flex-1 overflow-auto py-4 px-2">
           <div className="mb-6">
-            <p className="text-xs font-medium text-muted-foreground px-3 mb-3">
-              Menu
-            </p>
+            <p className="text-xs font-medium text-white  px-3 mb-3">Menu</p>
             <nav className="flex flex-col gap-1">
               {links.map((link) => (
                 <SidebarLink
@@ -72,36 +70,24 @@ export default function ProtectedLayout() {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col bg-background rounded-xl overflow-hidden m-4">
-        <header className="h-16 px-6 flex items-center justify-between">
-          {/* Left: Search */}
-          <SearchDialog />
+      <div className="flex-1 flex flex-col bg-accent rounded-xl overflow-hidden m-4  px-10">
+        <header className="h-16 px-6 flex items-center justify-end">
           {/* Right: User Actions */}
-          <div className="flex items-center gap-2 ml-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground"
-            >
-              <Bell size={18} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground"
-            >
-              <Settings size={18} />
-            </Button>
-            <div className="p-2 rounded-full bg-gray-100 overflow-hidden">
-              <User size={18} className="text-muted-foreground" />
-            </div>
+
+          <SearchDialog />
+          <Button variant="ghost" size="icon" className="text-muted-foreground">
+            <Bell size={18} />
+          </Button>
+          <Button variant="ghost" size="icon" className="text-muted-foreground">
+            <Settings size={18} />
+          </Button>
+          <div className="p-2 rounded-full bg-gray-100 overflow-hidden">
+            <User size={18} className="text-muted-foreground" />
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto">
-          <div className="p-6">
-            <Outlet />
-          </div>
+        <main className="flex-1 overflow-auto max-w-[100rem] mx-auto w-full ">
+          <Outlet />
         </main>
       </div>
     </div>
@@ -120,11 +106,11 @@ function SidebarLink({
   return (
     <Link
       to={to}
-      className="flex items-center gap-3 py-2 px-3 rounded-md transition-colors hover:bg-muted hover:text-white"
-      activeProps={{ className: "bg-muted border text-white" }}
-      inactiveProps={{ className: "text-muted-foreground" }}
+      className="flex items-center gap-3 py-2 px-3 rounded-md transition-colors "
+      activeProps={{ className: "bg-muted border text-primary font-semibold" }}
+      inactiveProps={{ className: "text-muted" }}
     >
-      <Icon className="text-muted-foreground size-4" />
+      <Icon />
       <span className="text-sm">{label}</span>
     </Link>
   );

@@ -176,7 +176,7 @@ export function DataTable<T extends Record<string, any>>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="text-center py-8 text-muted-foreground"
+                  className="text-center py-8 "
                 >
                   {searchTerm ? "No results found." : "No data available."}
                 </TableCell>
@@ -185,9 +185,6 @@ export function DataTable<T extends Record<string, any>>({
               currentData.map((row, index) => (
                 <TableRow
                   key={index}
-                  className={`${getRowClassName(row)} ${
-                    onRowClick ? "cursor-pointer" : ""
-                  }`}
                   tabIndex={onRowClick ? 0 : undefined}
                   onClick={() => handleRowClick(row)}
                   onKeyDown={(e) => handleRowKeyDown(row, e)}
