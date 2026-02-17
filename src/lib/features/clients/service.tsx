@@ -6,7 +6,6 @@ import { Client } from "./types";
 export async function createClient(data: NewClient) {
   try {
     const response = await api.post<Client>("/clients/", data);
-
     return response.data;
   } catch (error) {
     console.error("Error creating client:", error);
@@ -43,7 +42,7 @@ export async function getClients(params?: {
         errorData?.error ||
           errorData?.message ||
           errorData?.errors?.join(", ") ||
-          "Failed to fetch clients"
+          "Failed to fetch clients",
       );
     }
     throw error;
@@ -62,7 +61,7 @@ export async function getClientById(clientId: string) {
         errorData?.error ||
           errorData?.message ||
           errorData?.errors?.join(", ") ||
-          "Failed to fetch client"
+          "Failed to fetch client",
       );
     }
     throw error;
@@ -80,7 +79,7 @@ export async function updateClient(clientId: string, data: NewClient) {
         errorData?.error ||
           errorData?.message ||
           errorData?.errors?.join(", ") ||
-          "Failed to update client"
+          "Failed to update client",
       );
     }
     throw error;
@@ -97,9 +96,13 @@ export async function deleteClient(clientId: string) {
         errorData?.error ||
           errorData?.message ||
           errorData?.errors?.join(", ") ||
-          "Failed to delete client"
+          "Failed to delete client",
       );
     }
     throw error;
   }
+}
+
+export function getFileNotes(clientId: string) {
+  return api.get(`/clients/${clientId}/notes/`);
 }

@@ -7,21 +7,18 @@ import axios from "axios";
 export interface User {
   id: string;
   email: string;
-  first_name: string; // Changed to match Django field names
-  last_name: string; // Changed to match Django field names
+  firstName: string;
+  lastName: string;
   phone: string;
   business: {
-    // Changed to match nested business object
     id: string;
     name: string;
   };
 }
 
 interface TokenResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-  expires_in: number;
+  access: string;
+  refresh: string;
 }
 
 interface AuthResponse extends TokenResponse {
@@ -37,12 +34,12 @@ interface RegistrationResponse {
 }
 
 export async function register(
-  data: RegisterCredentials
+  data: RegisterCredentials,
 ): Promise<RegistrationResponse> {
   try {
     const response = await api.post<RegistrationResponse>(
       "/auth/register/",
-      data
+      data,
     );
 
     return response.data;
@@ -54,7 +51,7 @@ export async function register(
           errorData?.message ||
           errorData?.detail ||
           errorData?.errors?.join(", ") ||
-          "Registration failed"
+          "Registration failed",
       );
     }
     throw error;
@@ -63,12 +60,12 @@ export async function register(
 
 export async function login(data: LoginCredentials) {
   try {
-    const response = await api.post<AuthResponse>("/auth/login/", data); // Now returns user data too
+    const response = await api.post<AuthResponse>("/auth/token/", data);
 
-    // Store tokens (Django returns 'access' and 'refresh')
-    if (response.data.access_token) {
-      localStorage.setItem("access_token", response.data.access_token); // Store as access (matches Django)
-      localStorage.setItem("refresh_token", response.data.refresh_token); // Store as refresh (matches Django)
+    // Store tokens
+    if (response.data.access) {
+      localStorage.setItem("access_token", response.data.access);
+      localStorage.setItem("refresh_token", response.data.refresh);
     }
 
     // Store user data (now included thanks to CustomTokenObtainPairSerializer)
@@ -120,12 +117,12 @@ export async function refreshToken() {
       { refresh: refreshTokenValue },
       {
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
 
-    localStorage.setItem("access_token", response.data.access_token);
-    if (response.data.refresh_token) {
-      localStorage.setItem("refresh_token", response.data.refresh_token);
+    localStorage.setItem("access_token", response.data.access);
+    if (response.data.refresh) {
+      localStorage.setItem("refresh_token", response.data.refresh);
     }
 
     return response.data;
@@ -177,7 +174,7 @@ export async function getCurrentUser(): Promise<User | null> {
   // If no cached data and we have a valid token, fetch from API
   if (isAuthenticated()) {
     try {
-      const response = await api.get<User>("/auth/user");
+      const response = await api.get<User>("/me/");
       const userData = response.data;
 
       // Cache the fetched user data

@@ -19,6 +19,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
       "@auth": path.resolve(__dirname, "./src/lib/features/auth"),
       "@clients": path.resolve(__dirname, "./src/lib/features/clients"),
+      "@notes": path.resolve(__dirname, "./src/lib/features/notes"),
       "@components": path.resolve(__dirname, "./src/lib/components"),
       "@contexts": path.resolve(__dirname, "./src/lib/contexts"),
       "@hooks": path.resolve(__dirname, "./src/lib/hooks"),

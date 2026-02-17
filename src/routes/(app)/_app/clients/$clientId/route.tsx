@@ -1,18 +1,16 @@
 import { getClientById } from "@/lib/features/clients/service";
-import { createFileRoute, Outlet, useLoaderData } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  useLoaderData,
+  Link,
+  useMatchRoute,
+} from "@tanstack/react-router";
 import { type Client } from "@clients/types";
 import { Edit } from "lucide-react";
 import { Card } from "@/lib/components/ui/card";
 import { Button } from "@/lib/components/ui/button";
-import {
-  User,
-  Phone,
-  Mail,
-  MapPin,
-  Calendar,
-  Briefcase,
-  Copy,
-} from "lucide-react";
+import { Phone, Mail, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/(app)/_app/clients/$clientId")({
@@ -63,42 +61,14 @@ function ClientLayout() {
         <div className="bg-white border-b">
           <div className="mx-auto px-4 sm:px-6 lg:px-8">
             <nav className="-mb-px flex space-x-8">
-              <a
-                href="#"
-                className="border-primary-500 text-primary-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-              >
+              <NavTab to="/clients/$clientId" params={{ clientId: client.id }}>
                 Overview
-              </a>
-              <a
-                href="#"
-                className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-              >
-                Jobs
-              </a>
-              <a
-                href="#"
-                className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-              >
+              </NavTab>
+              <NavTab
+                to="/clients/$clientId/notes"
+                params={{ clientId: client.id }}>
                 Notes
-              </a>
-              <a
-                href="#"
-                className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-              >
-                Financials
-              </a>
-              <a
-                href="#"
-                className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-              >
-                Related Clients
-              </a>
-              <a
-                href="#"
-                className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-              >
-                Service Agreements
-              </a>
+              </NavTab>
             </nav>
           </div>
         </div>
@@ -109,6 +79,32 @@ function ClientLayout() {
         <Outlet />
       </div>
     </div>
+  );
+}
+
+function NavTab({
+  to,
+  params,
+  children,
+}: {
+  to: string;
+  params: { clientId: string };
+  children: React.ReactNode;
+}) {
+  const matchRoute = useMatchRoute();
+  const isActive = matchRoute({ to, params, fuzzy: false });
+
+  return (
+    <Link
+      to={to}
+      params={params}
+      className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+        isActive
+          ? "border-primary-500 text-primary-600"
+          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+      }`}>
+      {children}
+    </Link>
   );
 }
 
@@ -148,8 +144,7 @@ function ContactItem({
       tabIndex={0}
       onClick={handleCopy}
       onKeyDown={onKeyDown}
-      title={`Click to copy ${label}`}
-    >
+      title={`Click to copy ${label}`}>
       <div className="p-2 bg-gray-100 rounded-full">
         <Icon className="h-4 w-4" />
       </div>

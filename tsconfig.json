@@ -11,6 +11,7 @@
       "@/*": ["./src/*"],
       "@auth/*": ["./src/lib/features/auth/*"],
       "@clients/*": ["./src/lib/features/clients/*"],
+      "@notes/*": ["./src/lib/features/notes/*"],
       "@components/*": ["./src/lib/components/*"],
       "@contexts/*": ["./src/lib/contexts/*"],
       "@hooks/*": ["./src/lib/hooks/*"],
