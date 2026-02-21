@@ -23,7 +23,8 @@ import { Route as appAppDashboardIndexImport } from './routes/(app)/_app/dashboa
 import { Route as appAppClientsIndexImport } from './routes/(app)/_app/clients/index'
 import { Route as appAppClientsClientIdRouteImport } from './routes/(app)/_app/clients/$clientId/route'
 import { Route as appAppClientsClientIdIndexImport } from './routes/(app)/_app/clients/$clientId/index'
-import { Route as appAppClientsClientIdNotesIndexImport } from './routes/(app)/_app/clients/$clientId/notes/index'
+import { Route as appAppClientsClientIdFileNotesIndexImport } from './routes/(app)/_app/clients/$clientId/file-notes/index'
+import { Route as appAppClientsClientIdDocumentsIndexImport } from './routes/(app)/_app/clients/$clientId/documents/index'
 
 // Create Virtual Routes
 
@@ -101,10 +102,17 @@ const appAppClientsClientIdIndexRoute = appAppClientsClientIdIndexImport.update(
   } as any,
 )
 
-const appAppClientsClientIdNotesIndexRoute =
-  appAppClientsClientIdNotesIndexImport.update({
-    id: '/notes/',
-    path: '/notes/',
+const appAppClientsClientIdFileNotesIndexRoute =
+  appAppClientsClientIdFileNotesIndexImport.update({
+    id: '/file-notes/',
+    path: '/file-notes/',
+    getParentRoute: () => appAppClientsClientIdRouteRoute,
+  } as any)
+
+const appAppClientsClientIdDocumentsIndexRoute =
+  appAppClientsClientIdDocumentsIndexImport.update({
+    id: '/documents/',
+    path: '/documents/',
     getParentRoute: () => appAppClientsClientIdRouteRoute,
   } as any)
 
@@ -189,11 +197,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appAppClientsClientIdIndexImport
       parentRoute: typeof appAppClientsClientIdRouteImport
     }
-    '/(app)/_app/clients/$clientId/notes/': {
-      id: '/(app)/_app/clients/$clientId/notes/'
-      path: '/notes'
-      fullPath: '/clients/$clientId/notes'
-      preLoaderRoute: typeof appAppClientsClientIdNotesIndexImport
+    '/(app)/_app/clients/$clientId/documents/': {
+      id: '/(app)/_app/clients/$clientId/documents/'
+      path: '/documents'
+      fullPath: '/clients/$clientId/documents'
+      preLoaderRoute: typeof appAppClientsClientIdDocumentsIndexImport
+      parentRoute: typeof appAppClientsClientIdRouteImport
+    }
+    '/(app)/_app/clients/$clientId/file-notes/': {
+      id: '/(app)/_app/clients/$clientId/file-notes/'
+      path: '/file-notes'
+      fullPath: '/clients/$clientId/file-notes'
+      preLoaderRoute: typeof appAppClientsClientIdFileNotesIndexImport
       parentRoute: typeof appAppClientsClientIdRouteImport
     }
   }
@@ -203,13 +218,17 @@ declare module '@tanstack/react-router' {
 
 interface appAppClientsClientIdRouteRouteChildren {
   appAppClientsClientIdIndexRoute: typeof appAppClientsClientIdIndexRoute
-  appAppClientsClientIdNotesIndexRoute: typeof appAppClientsClientIdNotesIndexRoute
+  appAppClientsClientIdDocumentsIndexRoute: typeof appAppClientsClientIdDocumentsIndexRoute
+  appAppClientsClientIdFileNotesIndexRoute: typeof appAppClientsClientIdFileNotesIndexRoute
 }
 
 const appAppClientsClientIdRouteRouteChildren: appAppClientsClientIdRouteRouteChildren =
   {
     appAppClientsClientIdIndexRoute: appAppClientsClientIdIndexRoute,
-    appAppClientsClientIdNotesIndexRoute: appAppClientsClientIdNotesIndexRoute,
+    appAppClientsClientIdDocumentsIndexRoute:
+      appAppClientsClientIdDocumentsIndexRoute,
+    appAppClientsClientIdFileNotesIndexRoute:
+      appAppClientsClientIdFileNotesIndexRoute,
   }
 
 const appAppClientsClientIdRouteRouteWithChildren =
@@ -252,7 +271,8 @@ export interface FileRoutesByFullPath {
   '/clients': typeof appAppClientsIndexRoute
   '/dashboard': typeof appAppDashboardIndexRoute
   '/clients/$clientId/': typeof appAppClientsClientIdIndexRoute
-  '/clients/$clientId/notes': typeof appAppClientsClientIdNotesIndexRoute
+  '/clients/$clientId/documents': typeof appAppClientsClientIdDocumentsIndexRoute
+  '/clients/$clientId/file-notes': typeof appAppClientsClientIdFileNotesIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -264,7 +284,8 @@ export interface FileRoutesByTo {
   '/clients': typeof appAppClientsIndexRoute
   '/dashboard': typeof appAppDashboardIndexRoute
   '/clients/$clientId': typeof appAppClientsClientIdIndexRoute
-  '/clients/$clientId/notes': typeof appAppClientsClientIdNotesIndexRoute
+  '/clients/$clientId/documents': typeof appAppClientsClientIdDocumentsIndexRoute
+  '/clients/$clientId/file-notes': typeof appAppClientsClientIdFileNotesIndexRoute
 }
 
 export interface FileRoutesById {
@@ -280,7 +301,8 @@ export interface FileRoutesById {
   '/(app)/_app/clients/': typeof appAppClientsIndexRoute
   '/(app)/_app/dashboard/': typeof appAppDashboardIndexRoute
   '/(app)/_app/clients/$clientId/': typeof appAppClientsClientIdIndexRoute
-  '/(app)/_app/clients/$clientId/notes/': typeof appAppClientsClientIdNotesIndexRoute
+  '/(app)/_app/clients/$clientId/documents/': typeof appAppClientsClientIdDocumentsIndexRoute
+  '/(app)/_app/clients/$clientId/file-notes/': typeof appAppClientsClientIdFileNotesIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -295,7 +317,8 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/clients/$clientId/'
-    | '/clients/$clientId/notes'
+    | '/clients/$clientId/documents'
+    | '/clients/$clientId/file-notes'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -306,7 +329,8 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/clients/$clientId'
-    | '/clients/$clientId/notes'
+    | '/clients/$clientId/documents'
+    | '/clients/$clientId/file-notes'
   id:
     | '__root__'
     | '/'
@@ -320,7 +344,8 @@ export interface FileRouteTypes {
     | '/(app)/_app/clients/'
     | '/(app)/_app/dashboard/'
     | '/(app)/_app/clients/$clientId/'
-    | '/(app)/_app/clients/$clientId/notes/'
+    | '/(app)/_app/clients/$clientId/documents/'
+    | '/(app)/_app/clients/$clientId/file-notes/'
   fileRoutesById: FileRoutesById
 }
 
@@ -395,7 +420,8 @@ export const routeTree = rootRoute
       "parent": "/(app)/_app",
       "children": [
         "/(app)/_app/clients/$clientId/",
-        "/(app)/_app/clients/$clientId/notes/"
+        "/(app)/_app/clients/$clientId/documents/",
+        "/(app)/_app/clients/$clientId/file-notes/"
       ]
     },
     "/(app)/_app/clients/": {
@@ -410,8 +436,12 @@ export const routeTree = rootRoute
       "filePath": "(app)/_app/clients/$clientId/index.tsx",
       "parent": "/(app)/_app/clients/$clientId"
     },
-    "/(app)/_app/clients/$clientId/notes/": {
-      "filePath": "(app)/_app/clients/$clientId/notes/index.tsx",
+    "/(app)/_app/clients/$clientId/documents/": {
+      "filePath": "(app)/_app/clients/$clientId/documents/index.tsx",
+      "parent": "/(app)/_app/clients/$clientId"
+    },
+    "/(app)/_app/clients/$clientId/file-notes/": {
+      "filePath": "(app)/_app/clients/$clientId/file-notes/index.tsx",
       "parent": "/(app)/_app/clients/$clientId"
     }
   }

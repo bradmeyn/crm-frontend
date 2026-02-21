@@ -12,8 +12,8 @@ import {
   DialogTitle,
 } from "@components/ui/dialog";
 import { DropdownMenuItem } from "@components/ui/dropdown-menu";
-import type { FileNote, FileNoteDocument } from "@notes/types";
-import { getFileNoteDocumentDownloadUrl } from "@notes/service";
+import type { FileNote } from "@clients/file-notes/types";
+import type { ClientDocument } from "@clients/documents/types";
 
 interface ViewNoteMenuItemProps {
   note: FileNote;
@@ -25,15 +25,13 @@ export default function ViewNoteMenuItem({ note }: ViewNoteMenuItemProps) {
     null,
   );
 
-  const handleOpenDocument = async (document: FileNoteDocument) => {
+  const handleOpenDocument = async (document: ClientDocument) => {
     try {
       setLoadingDocumentId(document.id);
-      const url = await getFileNoteDocumentDownloadUrl(
-        note.clientId,
-        note.id,
-        document.id,
-      );
-      window.open(url, "_blank", "noopener,noreferrer");
+      if (!document.file) {
+        throw new Error("Document URL is not available");
+      }
+      window.open(document.file, "_blank", "noopener,noreferrer");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       toast.error(`Could not open document: ${message}`);
@@ -56,14 +54,14 @@ export default function ViewNoteMenuItem({ note }: ViewNoteMenuItemProps) {
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>{note.title}</DialogTitle>
-            <DialogDescription>Type: {note.type}</DialogDescription>
+            <DialogDescription>Type: {note.noteType}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <h4 className="text-sm font-medium mb-2">Content</h4>
+              <h4 className="text-sm font-medium mb-2">Body</h4>
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {note.content}
+                {note.body}
               </p>
             </div>
 
@@ -78,7 +76,7 @@ export default function ViewNoteMenuItem({ note }: ViewNoteMenuItemProps) {
                       <div className="flex items-center gap-2 min-w-0">
                         <FileText className="h-4 w-4 shrink-0" />
                         <span className="truncate text-sm">
-                          {document.fileName}
+                          {document.name}
                         </span>
                       </div>
                       <Button
@@ -89,7 +87,7 @@ export default function ViewNoteMenuItem({ note }: ViewNoteMenuItemProps) {
                         disabled={loadingDocumentId === document.id}>
                         {loadingDocumentId === document.id
                           ? "Opening..."
-                          : "Open PDF"}
+                          : "Open"}
                       </Button>
                     </div>
                   ))}

@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
-import type { FileNote } from "../types";
+import type { FileNote } from "@clients/file-notes/types";
 import EditNoteMenuItem from "./edit-note-menu-item";
 import ViewNoteMenuItem from "./view-note-menu-item";
 
@@ -19,9 +19,9 @@ export const noteColumns: ColumnDef<FileNote>[] = [
     enableSorting: true,
   },
   {
-    id: "type",
+    id: "noteType",
     header: "Type",
-    accessorKey: "type",
+    accessorKey: "noteType",
     enableSorting: true,
     cell: ({ getValue }) => (
       <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
@@ -30,14 +30,20 @@ export const noteColumns: ColumnDef<FileNote>[] = [
     ),
   },
   {
-    id: "content",
-    header: "Content",
-    accessorKey: "content",
+    id: "body",
+    header: "Body",
+    accessorKey: "body",
     cell: ({ getValue }) => (
       <div className="truncate max-w-[300px]" title={getValue()}>
         {getValue()}
       </div>
     ),
+  },
+  {
+    id: "isPrivate",
+    header: "Visibility",
+    accessorKey: "isPrivate",
+    cell: ({ getValue }) => (getValue() ? "Private" : "Shared"),
   },
   {
     id: "createdAt",

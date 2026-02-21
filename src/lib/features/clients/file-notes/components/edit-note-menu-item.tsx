@@ -23,17 +23,23 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@components/ui/form";
 import { DropdownMenuItem } from "@components/ui/dropdown-menu";
-import { useUpdateNote, noteKeys } from "@notes/hooks";
-import { noteSchema, type NewNote, NOTE_TYPES } from "@notes/schemas";
-import type { FileNote } from "@notes/types";
+import { useUpdateFileNote, fileNoteKeys } from "@clients/file-notes/hooks";
+import {
+  noteSchema,
+  type NewNote,
+  NOTE_TYPES,
+} from "@clients/file-notes/schemas";
+import type { FileNote } from "@clients/file-notes/types";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { clientDocumentKeys } from "@clients/documents/hooks";
 
 interface EditNoteMenuItemProps {
   note: FileNote;
@@ -43,14 +49,15 @@ export default function EditNoteMenuItem({ note }: EditNoteMenuItemProps) {
   const [open, setOpen] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const queryClient = useQueryClient();
-  const updateNoteMutation = useUpdateNote();
+  const updateFileNoteMutation = useUpdateFileNote();
 
   const form = useForm<NewNote>({
     resolver: zodResolver(noteSchema),
     defaultValues: {
       title: note.title,
-      content: note.content,
-      type: note.type,
+      body: note.body,
+      noteType: note.noteType,
+      isPrivate: note.isPrivate,
     },
   });
 
@@ -61,34 +68,38 @@ export default function EditNoteMenuItem({ note }: EditNoteMenuItemProps) {
 
     form.reset({
       title: note.title,
-      content: note.content,
-      type: note.type,
+      body: note.body,
+      noteType: note.noteType,
+      isPrivate: note.isPrivate,
     });
     setFiles([]);
-  }, [form, note.content, note.title, note.type, open]);
+  }, [form, note.body, note.title, note.noteType, note.isPrivate, open]);
 
   const onSubmit = (data: NewNote) => {
-    updateNoteMutation.mutate(
+    updateFileNoteMutation.mutate(
       {
         id: note.id,
-        clientId: note.clientId,
+        clientId: note.client,
         ...data,
         files,
       },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({
-            queryKey: noteKeys.list(note.clientId),
+            queryKey: fileNoteKeys.list(note.client),
           });
           queryClient.invalidateQueries({
-            queryKey: noteKeys.detail(note.clientId, note.id),
+            queryKey: fileNoteKeys.detail(note.client, note.id),
           });
-          toast.success("Note updated successfully");
+          queryClient.invalidateQueries({
+            queryKey: clientDocumentKeys.list(note.client),
+          });
+          toast.success("File note updated successfully");
           setOpen(false);
           setFiles([]);
         },
         onError: (error: Error) => {
-          toast.error(`Error updating note: ${error.message}`);
+          toast.error(`Error updating file note: ${error.message}`);
         },
       },
     );
@@ -117,7 +128,7 @@ export default function EditNoteMenuItem({ note }: EditNoteMenuItemProps) {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="type"
+                name="noteType"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type</FormLabel>
@@ -156,13 +167,13 @@ export default function EditNoteMenuItem({ note }: EditNoteMenuItemProps) {
 
               <FormField
                 control={form.control}
-                name="content"
+                name="body"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Content</FormLabel>
+                    <FormLabel>Body</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Write your note here..."
+                        placeholder="Write your file note here..."
                         className="min-h-[150px]"
                         {...field}
                       />
@@ -172,12 +183,37 @@ export default function EditNoteMenuItem({ note }: EditNoteMenuItemProps) {
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="isPrivate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Visibility</FormLabel>
+                    <Select
+                      onValueChange={(value) =>
+                        field.onChange(value === "private")
+                      }
+                      value={field.value ? "private" : "shared"}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select visibility..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="shared">Shared</SelectItem>
+                        <SelectItem value="private">Private</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormItem>
-                <FormLabel>Add PDF Documents</FormLabel>
+                <FormLabel>Add Documents</FormLabel>
                 <FormControl>
                   <Input
                     type="file"
-                    accept="application/pdf,.pdf"
                     multiple
                     onChange={(event) => {
                       const selectedFiles = event.target.files
@@ -187,6 +223,9 @@ export default function EditNoteMenuItem({ note }: EditNoteMenuItemProps) {
                     }}
                   />
                 </FormControl>
+                <FormDescription>
+                  Uploaded files will be linked to this file note.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
 
@@ -197,8 +236,12 @@ export default function EditNoteMenuItem({ note }: EditNoteMenuItemProps) {
                   onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={updateNoteMutation.isPending}>
-                  {updateNoteMutation.isPending ? "Saving..." : "Save Changes"}
+                <Button
+                  type="submit"
+                  disabled={updateFileNoteMutation.isPending}>
+                  {updateFileNoteMutation.isPending
+                    ? "Saving..."
+                    : "Save Changes"}
                 </Button>
               </DialogFooter>
             </form>

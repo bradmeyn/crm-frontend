@@ -104,5 +104,5 @@ export async function deleteClient(clientId: string) {
 }
 
 export function getFileNotes(clientId: string) {
-  return api.get(`/clients/${clientId}/notes/`);
+  return api.get(`/clients/${clientId}/file-notes/`);
 }

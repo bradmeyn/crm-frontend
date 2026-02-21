@@ -24,17 +24,22 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@components/ui/form";
-import { useCreateNote } from "@notes/hooks";
-import { noteSchema, type NewNote, NOTE_TYPES } from "@notes/schemas";
+import { useCreateFileNote, fileNoteKeys } from "@clients/file-notes/hooks";
+import {
+  noteSchema,
+  type NewNote,
+  NOTE_TYPES,
+} from "@clients/file-notes/schemas";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { noteKeys } from "@notes/hooks";
+import { clientDocumentKeys } from "@clients/documents/hooks";
 
 interface AddNoteDialogProps {
   clientId: string;
@@ -48,19 +53,20 @@ export default function AddNoteDialog({
   const [open, setOpen] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const queryClient = useQueryClient();
-  const createNoteMutation = useCreateNote();
+  const createFileNoteMutation = useCreateFileNote();
 
   const form = useForm<NewNote>({
     resolver: zodResolver(noteSchema),
     defaultValues: {
       title: "",
-      content: "",
-      type: "general",
+      body: "",
+      noteType: "GENERAL",
+      isPrivate: false,
     },
   });
 
   const onSubmit = (data: NewNote) => {
-    createNoteMutation.mutate(
+    createFileNoteMutation.mutate(
       {
         ...data,
         clientId,
@@ -68,14 +74,19 @@ export default function AddNoteDialog({
       },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: noteKeys.list(clientId) });
-          toast.success("Note created successfully");
+          queryClient.invalidateQueries({
+            queryKey: fileNoteKeys.list(clientId),
+          });
+          queryClient.invalidateQueries({
+            queryKey: clientDocumentKeys.list(clientId),
+          });
+          toast.success("File note created successfully");
           setOpen(false);
           setFiles([]);
           form.reset();
         },
         onError: (error: Error) => {
-          toast.error(`Error creating note: ${error.message}`);
+          toast.error(`Error creating file note: ${error.message}`);
         },
       },
     );
@@ -109,7 +120,7 @@ export default function AddNoteDialog({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="type"
+              name="noteType"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Type</FormLabel>
@@ -148,13 +159,13 @@ export default function AddNoteDialog({
 
             <FormField
               control={form.control}
-              name="content"
+              name="body"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Content</FormLabel>
+                  <FormLabel>Body</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Write your note here..."
+                      placeholder="Write your file note here..."
                       className="min-h-[150px]"
                       {...field}
                     />
@@ -164,12 +175,37 @@ export default function AddNoteDialog({
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="isPrivate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Visibility</FormLabel>
+                  <Select
+                    onValueChange={(value) =>
+                      field.onChange(value === "private")
+                    }
+                    value={field.value ? "private" : "shared"}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select visibility..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="shared">Shared</SelectItem>
+                      <SelectItem value="private">Private</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormItem>
-              <FormLabel>PDF Documents</FormLabel>
+              <FormLabel>Attach Documents</FormLabel>
               <FormControl>
                 <Input
                   type="file"
-                  accept="application/pdf,.pdf"
                   multiple
                   onChange={(event) => {
                     const selectedFiles = event.target.files
@@ -179,6 +215,9 @@ export default function AddNoteDialog({
                   }}
                 />
               </FormControl>
+              <FormDescription>
+                Uploaded files will be linked to this file note.
+              </FormDescription>
               <FormMessage />
             </FormItem>
 
@@ -189,8 +228,10 @@ export default function AddNoteDialog({
                 onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={createNoteMutation.isPending}>
-                {createNoteMutation.isPending ? "Creating..." : "Create Note"}
+              <Button type="submit" disabled={createFileNoteMutation.isPending}>
+                {createFileNoteMutation.isPending
+                  ? "Creating..."
+                  : "Create File Note"}
               </Button>
             </DialogFooter>
           </form>

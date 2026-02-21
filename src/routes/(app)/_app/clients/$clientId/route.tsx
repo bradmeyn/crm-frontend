@@ -33,7 +33,9 @@ function ClientLayout() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-4xl font-bold mx-4">
-              {client.firstName} ({client.preferredName}) {client.lastName}
+              {client.firstName}
+              {client.preferredName ? ` (${client.preferredName})` : ""}{" "}
+              {client.lastName}
             </h1>
 
             {/* Client Actions */}
@@ -65,9 +67,14 @@ function ClientLayout() {
                 Overview
               </NavTab>
               <NavTab
-                to="/clients/$clientId/notes"
+                to="/clients/$clientId/file-notes"
                 params={{ clientId: client.id }}>
-                Notes
+                File Notes
+              </NavTab>
+              <NavTab
+                to="/clients/$clientId/documents"
+                params={{ clientId: client.id }}>
+                Documents
               </NavTab>
             </nav>
           </div>
